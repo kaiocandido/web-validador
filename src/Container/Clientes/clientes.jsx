@@ -1,143 +1,206 @@
-import { useState } from 'react';
-import { Button } from '../../components/ui/button'; // Usando o botão do ShadCN/UI
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Usando o Card do ShadCN/UI
-import Logo from "../../Assets/Monitor-rafiki.svg";
+// src/Container/Clientes/clientes.jsx
 
-// Exemplo de dados de clientes (20 clientes)
-const initialClients = [
-  { id: 1, name: 'João Silva', email: 'joao@example.com', empresa: 'Empresa A', telefone: '1234-5678' },
-  { id: 2, name: 'Maria Oliveira', email: 'maria@example.com', empresa: 'Empresa B', telefone: '2345-6789' },
-  { id: 3, name: 'Carlos Santos', email: 'carlos@example.com', empresa: 'Empresa C', telefone: '3456-7890' },
-  { id: 4, name: 'Ana Souza', email: 'ana@example.com', empresa: 'Empresa D', telefone: '4567-8901' },
-  { id: 5, name: 'Lucas Costa', email: 'lucas@example.com', empresa: 'Empresa E', telefone: '5678-9012' },
-  { id: 6, name: 'Fernanda Lima', email: 'fernanda@example.com', empresa: 'Empresa F', telefone: '6789-0123' },
-  { id: 7, name: 'Gustavo Pereira', email: 'gustavo@example.com', empresa: 'Empresa G', telefone: '7890-1234' },
-  { id: 8, name: 'Patricia Rocha', email: 'patricia@example.com', empresa: 'Empresa H', telefone: '8901-2345' },
-  { id: 9, name: 'Ricardo Silva', email: 'ricardo@example.com', empresa: 'Empresa I', telefone: '9012-3456' },
-  { id: 10, name: 'Eduardo Martins', email: 'eduardo@example.com', empresa: 'Empresa J', telefone: '0123-4567' },
-  { id: 11, name: 'Juliana Lima', email: 'juliana@example.com', empresa: 'Empresa K', telefone: '2345-6789' },
-  { id: 12, name: 'Vitor Oliveira', email: 'vitor@example.com', empresa: 'Empresa L', telefone: '3456-7890' },
-  { id: 13, name: 'Bianca Souza', email: 'bianca@example.com', empresa: 'Empresa M', telefone: '4567-8901' },
-  { id: 14, name: 'Roberta Costa', email: 'roberta@example.com', empresa: 'Empresa N', telefone: '5678-9012' },
-  { id: 15, name: 'Carlos Henrique', email: 'carlos.henrique@example.com', empresa: 'Empresa O', telefone: '6789-0123' },
-  { id: 16, name: 'Juliana Martins', email: 'juliana.martins@example.com', empresa: 'Empresa P', telefone: '7890-1234' },
-  { id: 17, name: 'Marcelo Silva', email: 'marcelo.silva@example.com', empresa: 'Empresa Q', telefone: '8901-2345' },
-  { id: 18, name: 'Luciana Ribeiro', email: 'luciana.ribeiro@example.com', empresa: 'Empresa R', telefone: '9012-3456' },
-  { id: 19, name: 'Rafael Oliveira', email: 'rafael.oliveira@example.com', empresa: 'Empresa S', telefone: '0123-4567' },
-  { id: 20, name: 'Jéssica Santos', email: 'jessica.santos@example.com', empresa: 'Empresa T', telefone: '2345-6789' }
-];
+import { useEffect, useState } from "react";
+
+import Logo from "../../Assets/Monitor-rafiki.svg";
+import { api } from "../../Services/api";
+
+const ITEMS_PER_PAGE = 5;
 
 export function Clientes() {
-  const [clients, setClients] = useState(initialClients);
-  const [currentPage, setCurrentPage] = useState(1); // Página atual
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para armazenar o filtro de pesquisa
+  const [clients, setClients] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const itemsPerPage = 5; // Número de itens por página
+  // debounce simples
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
-  // Função para excluir cliente
-  const handleDelete = (id) => {
-    setClients(clients.filter(client => client.id !== id)); // Remove o cliente da lista
+  const fetchUsers = async (page = 1, search = "") => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/users", {
+        params: { page, limit: ITEMS_PER_PAGE, search },
+      });
+      setClients(data?.data || []);
+      setTotalPages(data?.meta?.totalPages || 1);
+    } catch (err) {
+      console.error(err);
+      setClients([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Função para filtrar os clientes com base no nome, telefone ou empresa
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) || // Filtra por nome
-    client.telefone.includes(searchTerm) || // Filtra por telefone
-    client.empresa.toLowerCase().includes(searchTerm.toLowerCase()) || // Filtra por empresa
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por email
-  );
-
-  // Paginação: Calculando a parte da lista que será exibida na página atual
-  const indexOfLastClient = currentPage * itemsPerPage; // Índice do último cliente na página
-  const indexOfFirstClient = indexOfLastClient - itemsPerPage; // Índice do primeiro cliente na página
-  const currentClients = filteredClients.slice(indexOfFirstClient, indexOfLastClient); // Slice para pegar os clientes da página atual
-
-  // Função para mudar a página
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Cálculo do número total de páginas
-  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+  useEffect(() => {
+    fetchUsers(currentPage, debouncedSearch);
+  }, [currentPage, debouncedSearch]);
 
   return (
     <main className="sm:ml-14 p-4">
-      <header className="items-center justify-center flex flex-col mt-10">
-        <h1 className="font-bold text-4xl">Clientes</h1>
-        <img src={Logo} alt="Logo" className="w-full h-100 flex p-16" />
+      <header className="items-center justify-center flex flex-col mt-6 md:mt-10">
+        <h1 className="font-bold text-3xl md:text-4xl text-center">Clientes</h1>
+        {/* Esconde o banner no mobile para ganhar espaço */}
+        <img
+          src={Logo}
+          alt="Logo"
+          className="hidden md:flex w-full h-100 p-16"
+        />
       </header>
-      
-      <div className="p-6">
+
+      <div className="p-4 md:p-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Lista de Clientes</CardTitle>
+            <CardTitle className="text-lg md:text-xl font-bold">
+              Lista de Clientes
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Filtro de pesquisa */}
-            <div className="mb-4">
-              <input
+            {/* Busca com botão limpar */}
+            <div className="mb-4 relative">
+              <Input
                 type="text"
                 placeholder="Buscar por nome, telefone, empresa ou e-mail"
-                className="border p-2 w-full"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setSearchTerm(e.target.value);
+                }}
+                className="pr-10"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  aria-label="Limpar busca"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setCurrentPage(1);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
-            {/* Tabela de Clientes */}
-            <table className="min-w-full table-auto">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-4 py-2 text-left">Nome</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Empresa</th>
-                  <th className="px-4 py-2 text-left">Telefone</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentClients.length === 0 ? (
+            {/* Tabela (desktop) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full table-auto">
+                <thead className="bg-gray-200">
                   <tr>
-                    <td colSpan={5} className="px-4 py-2 text-center text-gray-500">
-                      Nenhum cliente encontrado.
-                    </td>
+                    <th className="px-4 py-2 text-left">Nome</th>
+                    <th className="px-4 py-2 text-left">Email</th>
+                    <th className="px-4 py-2 text-left">Empresa</th>
+                    <th className="px-4 py-2 text-left">Telefone</th>
                   </tr>
-                ) : (
-                  currentClients.map((client) => (
-                    <tr key={client.id} className="border-b">
-                      <td className="px-4 py-2">{client.name}</td>
-                      <td className="px-4 py-2">{client.email}</td>
-                      <td className="px-4 py-2">{client.empresa}</td>
-                      <td className="px-4 py-2">{client.telefone}</td>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-4 py-6 text-center text-gray-500"
+                      >
+                        Carregando...
+                      </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : clients.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-4 py-6 text-center text-gray-500"
+                      >
+                        Nenhum cliente encontrado.
+                      </td>
+                    </tr>
+                  ) : (
+                    clients.map((c) => (
+                      <tr key={c.id} className="border-b">
+                        <td className="px-4 py-2">{c.name}</td>
+                        <td className="px-4 py-2">{c.email}</td>
+                        <td className="px-4 py-2">{c.enterpriseName || "-"}</td>
+                        <td className="px-4 py-2">{c.number_phone || "-"}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Cards (mobile) */}
+            <div className="md:hidden space-y-3">
+              {loading ? (
+                <div className="text-center text-gray-500 py-6">
+                  Carregando...
+                </div>
+              ) : clients.length === 0 ? (
+                <div className="text-center text-gray-500 py-6">
+                  Nenhum cliente encontrado.
+                </div>
+              ) : (
+                clients.map((c) => (
+                  <div key={c.id} className="rounded-lg border bg-white p-3">
+                    <div className="font-medium text-base">{c.name}</div>
+                    <div className="text-sm text-muted-foreground break-all">
+                      {c.email}
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground block">
+                          Empresa
+                        </span>
+                        <span className="font-medium">
+                          {c.enterpriseName || "-"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block">
+                          Telefone
+                        </span>
+                        <span className="font-medium">
+                          {c.number_phone || "-"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
 
             {/* Paginação */}
-            <div className="mt-4 flex justify-center">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 disabled={currentPage === 1}
-                onClick={() => paginate(currentPage - 1)}
+                onClick={() => setCurrentPage((p) => p - 1)}
               >
                 Anterior
               </Button>
-              {Array.from({ length: totalPages }, (_, index) => (
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Button
-                  key={index + 1}
-                  variant={index + 1 === currentPage ? 'filled' : 'outline'}
+                  key={p}
+                  variant={p === currentPage ? "default" : "outline"}
                   size="sm"
-                  className="mx-1"
-                  onClick={() => paginate(index + 1)}
+                  className="min-w-10"
+                  onClick={() => setCurrentPage(p)}
                 >
-                  {index + 1}
+                  {p}
                 </Button>
               ))}
+
               <Button
                 variant="outline"
                 size="sm"
                 disabled={currentPage === totalPages}
-                onClick={() => paginate(currentPage + 1)}
+                onClick={() => setCurrentPage((p) => p + 1)}
               >
                 Próxima
               </Button>

@@ -1,8 +1,3 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
-import { Check } from "lucide-react";
-import { Bar, XAxis, BarChart, CartesianGrid } from "recharts";
-
 export function Chart() {
   const chartData = [
     { month: "Janeiro", desktop: 186, mobile: 80 },
@@ -35,8 +30,19 @@ export function Chart() {
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <BarChart data={chartData}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)} />
-            <Bar dataKey="desktop" fill={chartConfig.desktop.color} radius={[4, 4, 0, 0]} barSize={32} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <Bar
+              dataKey="desktop"
+              fill={chartConfig.desktop.color}
+              radius={[4, 4, 0, 0]}
+              barSize={32}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
