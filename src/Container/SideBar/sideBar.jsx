@@ -1,19 +1,28 @@
 // src/Container/SideBar/sideBar.jsx
-import { useState } from "react";
+import { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import { Menu, Package, X, Home, Check, User, Settings2, LogOut } from 'lucide-react';
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function SideBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const closeMobile = () => setMobileOpen(false);
 
+  // Classes condicionais para NavLink (recebe { isActive })
   const linkClassesIconOnly = ({ isActive }) =>
     `flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors hover:text-foreground ${
-      isActive ? "text-foreground" : "text-muted-foreground"
+      isActive ? 'text-foreground' : 'text-muted-foreground'
     }`;
 
   const linkClassesRow = ({ isActive }) =>
     `flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted ${
-      isActive ? "bg-muted text-foreground" : "text-muted-foreground"
+      isActive ? 'bg-muted text-foreground' : 'text-muted-foreground'
     }`;
 
   return (
@@ -42,7 +51,7 @@ export function SideBar() {
       {/* Panel */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 border-r bg-white p-4 transition-transform duration-200 sm:hidden ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-hidden={!mobileOpen}
         aria-label="Navegação móvel"
@@ -66,29 +75,17 @@ export function SideBar() {
             <span>Início</span>
           </NavLink>
 
-          <NavLink
-            to="/validacao"
-            className={linkClassesRow}
-            onClick={closeMobile}
-          >
+          <NavLink to="/validacao" className={linkClassesRow} onClick={closeMobile}>
             <Check className="h-5 w-5" />
             <span>Validação</span>
           </NavLink>
 
-          <NavLink
-            to="/clientes"
-            className={linkClassesRow}
-            onClick={closeMobile}
-          >
+          <NavLink to="/clientes" className={linkClassesRow} onClick={closeMobile}>
             <User className="h-5 w-5" />
             <span>Clientes</span>
           </NavLink>
 
-          <NavLink
-            to="/cadastro"
-            className={linkClassesRow}
-            onClick={closeMobile}
-          >
+          <NavLink to="/cadastro" className={linkClassesRow} onClick={closeMobile}>
             <Settings2 className="h-5 w-5" />
             <span>Cadastro</span>
           </NavLink>
@@ -117,7 +114,7 @@ export function SideBar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/" className={linkClassesIconOnly}>
-                  <Home className=" ml-2 h-5 w-5  mt-2" />
+                  <Home className="ml-2 mt-2 h-5 w-5" />
                   <span className="sr-only">Início</span>
                 </NavLink>
               </TooltipTrigger>
@@ -129,7 +126,7 @@ export function SideBar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/validacao" className={linkClassesIconOnly}>
-                  <Check className="ml-2 h-5 w-5  mt-2" />
+                  <Check className="ml-2 mt-2 h-5 w-5" />
                   <span className="sr-only">Validação</span>
                 </NavLink>
               </TooltipTrigger>
@@ -141,7 +138,7 @@ export function SideBar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/clientes" className={linkClassesIconOnly}>
-                  <User className="ml-2 h-5 w-5 mt-2" />
+                  <User className="ml-2 mt-2 h-5 w-5" />
                   <span className="sr-only">Clientes</span>
                 </NavLink>
               </TooltipTrigger>
@@ -153,7 +150,7 @@ export function SideBar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/cadastro" className={linkClassesIconOnly}>
-                  <Settings2 className="ml-2 h-5 w-5  mt-2" />
+                  <Settings2 className="ml-2 mt-2 h-5 w-5" />
                   <span className="sr-only">Cadastro</span>
                 </NavLink>
               </TooltipTrigger>

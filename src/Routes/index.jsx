@@ -1,5 +1,12 @@
 // src/Routes/index.jsx
 import { createBrowserRouter } from "react-router-dom";
+import { SideBar } from "../Container/SideBar/sideBar.jsx";
+import { Inicio } from "../Container/Inicio/inicio.jsx";
+import { PageValidacao } from "../Container/PageValidacao/pageValidacao.jsx";
+import { Clientes } from "../Container/Clientes/clientes.jsx";
+import { Cadastro } from "../Container/Cadastro/cadastro.jsx";
+import { Login } from "../Container/Login/login.jsx";
+
 
 export const router = createBrowserRouter([
   // sem sidebar

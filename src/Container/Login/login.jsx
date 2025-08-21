@@ -1,12 +1,21 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import * as yup from "yup";
+// src/Container/Login/login.jsx
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { toast } from 'react-toastify';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-import Logo from "../../Assets/Innovation-amico (1).svg";
-import { api } from "../../Services/api";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+
+import { api } from '../../Services/api';
+import Logo from '../../Assets/Innovation-amico (1).svg';
+
 
 export function Login() {
   const navigate = useNavigate();

@@ -1,5 +1,37 @@
+// src/Container/PageValidacao/pageValidacao.jsx (ajuste o caminho se o seu for outro)
 import { useState } from "react";
 import { toast } from "react-toastify";
+
+// UI (shadcn)
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+// Ícones
+import {
+  Key,
+  Check,
+  User,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
 import Logo from "../../Assets/Secure data-bro.svg";
 import { api } from "../../Services/api";
@@ -19,7 +51,7 @@ export function Validacao() {
     if (!email) return toast.info("Informe o e-mail.");
     setLoadingGerar(true);
     try {
-      // ✅ singular
+      // endpoint singular conforme seu backend
       await api.post("/token/generate", { email });
       toast.success("Chave gerada e enviada por e-mail!");
     } catch (err) {
@@ -34,7 +66,7 @@ export function Validacao() {
     if (!chave) return toast.info("Informe a chave.");
     setLoadingValidar(true);
     try {
-      // ✅ singular; agora backend não exige auth
+      // backend não exige auth
       const { data } = await api.post("/token/validate", { key: chave });
       setUserInfo(data.user || null);
       setModalOk(true);
@@ -151,9 +183,7 @@ export function Validacao() {
               </CardTitle>
               <User className="ml-auto w-4 h-4" />
             </div>
-            <CardDescription>
-              O resultado aparecerá assim que validado
-            </CardDescription>
+            <CardDescription>O resultado aparecerá assim que validado</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mt-4 items-center justify-center flex flex-col text-muted-foreground">

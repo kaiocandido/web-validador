@@ -1,6 +1,10 @@
 // src/Container/Clientes/clientes.jsx
-
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 import Logo from "../../Assets/Monitor-rafiki.svg";
 import { api } from "../../Services/api";
@@ -11,11 +15,11 @@ export function Clientes() {
   const [clients, setClients] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // debounce simples
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  // Debounce da busca
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 400);
     return () => clearTimeout(t);
@@ -50,7 +54,7 @@ export function Clientes() {
         <img
           src={Logo}
           alt="Logo"
-          className="hidden md:flex w-full h-100 p-16"
+          className="w-full h-100 flex p-16"
         />
       </header>
 
@@ -61,6 +65,7 @@ export function Clientes() {
               Lista de Clientes
             </CardTitle>
           </CardHeader>
+
           <CardContent>
             {/* Busca com botão limpar */}
             <div className="mb-4 relative">
@@ -103,19 +108,13 @@ export function Clientes() {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td
-                        colSpan={4}
-                        className="px-4 py-6 text-center text-gray-500"
-                      >
+                      <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
                         Carregando...
                       </td>
                     </tr>
                   ) : clients.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={4}
-                        className="px-4 py-6 text-center text-gray-500"
-                      >
+                      <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
                         Nenhum cliente encontrado.
                       </td>
                     </tr>
@@ -123,7 +122,7 @@ export function Clientes() {
                     clients.map((c) => (
                       <tr key={c.id} className="border-b">
                         <td className="px-4 py-2">{c.name}</td>
-                        <td className="px-4 py-2">{c.email}</td>
+                        <td className="px-4 py-2 break-all">{c.email}</td>
                         <td className="px-4 py-2">{c.enterpriseName || "-"}</td>
                         <td className="px-4 py-2">{c.number_phone || "-"}</td>
                       </tr>
@@ -136,36 +135,22 @@ export function Clientes() {
             {/* Cards (mobile) */}
             <div className="md:hidden space-y-3">
               {loading ? (
-                <div className="text-center text-gray-500 py-6">
-                  Carregando...
-                </div>
+                <div className="text-center text-gray-500 py-6">Carregando...</div>
               ) : clients.length === 0 ? (
-                <div className="text-center text-gray-500 py-6">
-                  Nenhum cliente encontrado.
-                </div>
+                <div className="text-center text-gray-500 py-6">Nenhum cliente encontrado.</div>
               ) : (
                 clients.map((c) => (
                   <div key={c.id} className="rounded-lg border bg-white p-3">
                     <div className="font-medium text-base">{c.name}</div>
-                    <div className="text-sm text-muted-foreground break-all">
-                      {c.email}
-                    </div>
+                    <div className="text-sm text-muted-foreground break-all">{c.email}</div>
                     <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground block">
-                          Empresa
-                        </span>
-                        <span className="font-medium">
-                          {c.enterpriseName || "-"}
-                        </span>
+                        <span className="text-muted-foreground block">Empresa</span>
+                        <span className="font-medium">{c.enterpriseName || "-"}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground block">
-                          Telefone
-                        </span>
-                        <span className="font-medium">
-                          {c.number_phone || "-"}
-                        </span>
+                        <span className="text-muted-foreground block">Telefone</span>
+                        <span className="font-medium">{c.number_phone || "-"}</span>
                       </div>
                     </div>
                   </div>

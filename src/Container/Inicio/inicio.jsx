@@ -1,11 +1,36 @@
+// src/Container/Inicio/inicio.jsx
 import { useEffect, useState } from "react";
 
-// Se você já implementou gráficos/histórico, mantenha; senão pode comentar as partes
+// UI (shadcn)
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+
+// Ícones
+import { User, Key, CheckCircle2, XCircle } from "lucide-react";
+
+// Gráficos (Recharts)
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Bar,
+} from "recharts";
 
 import Logo from "../../Assets/Onboarding-amico.svg";
 import { api } from "../../Services/api";
 
-const COLORS = ["#16a34a", "#dc2626"]; // verde/vermelho
+const COLORS = ["#16a34a", "#dc2626"]; // verde / vermelho
 
 export function Inicio() {
   const [stats, setStats] = useState({
@@ -17,10 +42,9 @@ export function Inicio() {
 
   const [history, setHistory] = useState([]);
   const [loadingHist, setLoadingHist] = useState(true);
-  const [historyEnabled, setHistoryEnabled] = useState(true); // se a rota não existir, desabilita
+  const [historyEnabled, setHistoryEnabled] = useState(true);
 
   useEffect(() => {
-    // 1) carrega somente /stats (sempre)
     const loadStats = async () => {
       try {
         const { data } = await api.get("/stats");
@@ -33,27 +57,18 @@ export function Inicio() {
           },
         });
       } catch (err) {
-        console.error(
-          "Erro ao carregar /stats:",
-          err?.response?.data || err.message,
-        );
+        console.error("Erro ao carregar /stats:", err?.response?.data || err.message);
       } finally {
         setLoadingStats(false);
       }
     };
 
-    // 2) tenta carregar histórico; se 404/erro, só desabilita a seção sem quebrar os cards
     const loadHistory = async () => {
       try {
-        const { data } = await api.get("/validation/history", {
-          params: { limit: 10 },
-        });
+        const { data } = await api.get("/validation/history", { params: { limit: 10 } });
         setHistory(data?.data ?? []);
       } catch (err) {
-        console.warn(
-          "Histórico indisponível; ocultando seção.",
-          err?.response?.status,
-        );
+        console.warn("Histórico indisponível; ocultando seção.", err?.response?.status);
         setHistoryEnabled(false);
       } finally {
         setLoadingHist(false);
@@ -61,7 +76,7 @@ export function Inicio() {
     };
 
     loadStats();
-    loadHistory(); // opcional; não atrapalha os cards
+    loadHistory();
   }, []);
 
   const pieData = [
@@ -147,24 +162,17 @@ export function Inicio() {
         </Card>
       </section>
 
-      {/* Gráficos (com tooltip) */}
+      {/* Gráficos */}
       <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Overview de Validação </CardTitle>
-            <CardDescription>
-              Passe o mouse para ver a quantidade.
-            </CardDescription>
+            <CardTitle>Overview de Validação</CardTitle>
+            <CardDescription>Passe o mouse para ver a quantidade.</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius="80%"
-                >
+                <Pie data={pieData} dataKey="value" nameKey="name" outerRadius="80%">
                   {pieData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
@@ -177,10 +185,8 @@ export function Inicio() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Overview de Validação </CardTitle>
-            <CardDescription>
-              Passe o mouse para ver a quantidade.
-            </CardDescription>
+            <CardTitle>Overview de Validação</CardTitle>
+            <CardDescription>Passe o mouse para ver a quantidade.</CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -196,15 +202,13 @@ export function Inicio() {
         </Card>
       </section>
 
-      {/* Histórico (mostra só se a rota existir) */}
+      {/* Histórico (opcional) */}
       {historyEnabled && (
         <section className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Histórico de Validações</CardTitle>
-              <CardDescription>
-                Últimas chaves verificadas (sucesso/erro).
-              </CardDescription>
+              <CardDescription>Últimas chaves verificadas (sucesso/erro).</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
               <table className="min-w-full table-auto">
@@ -220,19 +224,13 @@ export function Inicio() {
                 <tbody>
                   {loadingHist ? (
                     <tr>
-                      <td
-                        colSpan={5}
-                        className="px-4 py-6 text-center text-gray-500"
-                      >
+                      <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
                         Carregando…
                       </td>
                     </tr>
                   ) : history.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={5}
-                        className="px-4 py-6 text-center text-gray-500"
-                      >
+                      <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
                         Sem registros.
                       </td>
                     </tr>
@@ -244,19 +242,13 @@ export function Inicio() {
                         </td>
                         <td className="px-4 py-2">{h.email || "-"}</td>
                         <td className="px-4 py-2">
-                          {h.key?.length > 3
-                            ? `${h.key.slice(0, 3)}***`
-                            : h.key}
+                          {h.key?.length > 3 ? `${h.key.slice(0, 3)}***` : h.key}
                         </td>
                         <td className="px-4 py-2">
                           {h.success ? (
-                            <span className="text-green-600 font-medium">
-                              Válido
-                            </span>
+                            <span className="text-green-600 font-medium">Válido</span>
                           ) : (
-                            <span className="text-red-600 font-medium">
-                              Inválido
-                            </span>
+                            <span className="text-red-600 font-medium">Inválido</span>
                           )}
                         </td>
                         <td className="px-4 py-2">{h.reason || "-"}</td>
